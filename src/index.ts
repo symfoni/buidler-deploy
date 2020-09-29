@@ -23,7 +23,7 @@ import { ERRORS } from "@nomiclabs/buidler/internal/core/errors-list";
 import chalk from "chalk";
 import {
   TASK_NODE,
-  TASK_COMPILE_GET_COMPILER_INPUT
+  TASK_COMPILE_SOLIDITY_GET_COMPILER_INPUT
 } from "@nomiclabs/buidler/builtin-tasks/task-names";
 
 import debug from "debug";
@@ -130,7 +130,7 @@ export default function() {
     // addIfNotPresent(settings.outputSelection["*"][""], "ast");
   }
 
-  internalTask(TASK_COMPILE_GET_COMPILER_INPUT).setAction(
+  internalTask(TASK_COMPILE_SOLIDITY_GET_COMPILER_INPUT).setAction(
     async (_, __, runSuper) => {
       const input = await runSuper();
       setupExtraSolcSettings(input.settings);
@@ -314,7 +314,6 @@ export default function() {
       return createProvider(
         networkName,
         { loggingEnabled: true, ...networkConfig },
-        config.solc.version,
         config.paths
       );
     });
@@ -374,7 +373,26 @@ export default function() {
       await bre.run("deploy:run", args);
 
       // enable logging
-      const provider = bre.network.provider as any;
+      // TODO fix this when there's a proper mechanism for doing this
+      let provider = bre.network.provider as any;
+      let i = 0;
+      while (provider._loggingEnabled === undefined) {
+        if (provider._provider !== undefined) {
+          provider = provider._provider;
+        } else if (provider._wrappedProvider !== undefined) {
+          provider = provider._wrappedProvider;
+        } else {
+          throw new Error("should not happen");
+        }
+
+        // a BuidlerEVMProvider should eventually be found, but
+        // just in case we add a max number of iterations here
+        // to avoid and endless loop
+        i++;
+        if (i > 100) {
+          throw new Error("should not happen");
+        }
+      }
       provider._loggingEnabled = true;
       provider._ethModule._logger = provider._logger;
 
@@ -412,11 +430,7 @@ export default function() {
         if (watchRequired) {
           try {
             const { watchCompilerOutput } = watchRequired;
-            await watchCompilerOutput(
-              server.getProvider(),
-              config.solc,
-              config.paths
-            );
+            await watchCompilerOutput(server.getProvider(), config.paths);
           } catch (error) {
             console.warn(
               chalk.yellow(

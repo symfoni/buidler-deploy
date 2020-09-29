@@ -14,10 +14,10 @@ export async function getChainId(bre: BuidlerRuntimeEnvironment) {
     return chainId;
   }
   try {
-    chainId = await bre.ethereum.send("eth_chainId");
+    chainId = await bre.network.provider.send("eth_chainId");
   } catch (e) {
     console.log("failed to get chainId, falling back on net_version...");
-    chainId = await bre.ethereum.send("net_version");
+    chainId = await bre.network.provider.send("net_version");
   }
 
   if (chainId.startsWith("0x")) {

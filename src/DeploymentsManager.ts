@@ -1,4 +1,4 @@
-import { readArtifactSync, readArtifact } from "@nomiclabs/buidler/plugins";
+import { Artifacts } from "@nomiclabs/buidler/plugins";
 import {
   BuidlerRuntimeEnvironment,
   DeployFunction,
@@ -130,19 +130,18 @@ export class DeploymentsManager {
         return this.db.deployments; // TODO copy
       },
       getArtifact: async (contractName: string): Promise<any> => {
+        const artifacts = new Artifacts(this.env.config.paths.artifacts);
         let artifact;
         let lastError: any;
         try {
-          artifact = await readArtifact(
-            this.env.config.paths.artifacts,
-            contractName
-          );
+          artifact = await artifacts.readArtifact(contractName);
         } catch (e) {
           lastError = e;
           const importPaths = this.getImportPaths();
           for (const importPath of importPaths) {
+            const importsArtifacts = new Artifacts(importPath);
             try {
-              artifact = await readArtifact(importPath, contractName);
+              artifact = await importsArtifacts.readArtifact(contractName);
               if (artifact) {
                 return artifact;
               }
@@ -159,19 +158,18 @@ export class DeploymentsManager {
         return artifact;
       },
       getArtifactSync: (contractName: string): any => {
+        const artifacts = new Artifacts(this.env.config.paths.artifacts);
         let artifact;
         let lastError: any;
         try {
-          artifact = readArtifactSync(
-            this.env.config.paths.artifacts,
-            contractName
-          );
+          artifact = artifacts.readArtifactSync(contractName);
         } catch (e) {
           lastError = e;
           const importPaths = this.getImportPaths();
           for (const importPath of importPaths) {
+            const importsArtifacts = new Artifacts(importPath);
             try {
-              artifact = readArtifactSync(importPath, contractName);
+              artifact = importsArtifacts.readArtifactSync(contractName);
               if (artifact) {
                 return artifact;
               }
@@ -366,7 +364,7 @@ export class DeploymentsManager {
             (txData.name ? ` for ${txData.name} Deployment` : "")
         );
       }
-      const receipt = await waitForTx(this.env.ethereum, txHash, false);
+      const receipt = await waitForTx(this.env.network.provider, txHash, false);
       if (receipt.contractAddress && txData.name) {
         await this.saveDeployment(txData.name, {
           ...txData.deployment,
@@ -613,7 +611,7 @@ export class DeploymentsManager {
       let receiptFetched;
       try {
         receiptFetched = await waitForTx(
-          this.env.ethereum,
+          this.env.network.provider,
           obj.transactionHash,
           true
         );
@@ -1044,7 +1042,7 @@ export class DeploymentsManager {
   }
 
   private async saveSnapshot(key: string, data?: any) {
-    const snapshot = await this.env.ethereum.send("evm_snapshot", []);
+    const snapshot = await this.env.network.provider.send("evm_snapshot", []);
     this.db.pastFixtures[key] = {
       index: ++this.db.snapshotCounter,
       snapshot,
@@ -1068,8 +1066,8 @@ export class DeploymentsManager {
         delete this.db.pastFixtures[fixtureKey];
       }
     }
-    await this.env.ethereum.send("evm_revert", [saved.snapshot]);
-    saved.snapshot = await this.env.ethereum.send("evm_snapshot", []); // it is necessary to re-snapshot it
+    await this.env.network.provider.send("evm_revert", [saved.snapshot]);
+    saved.snapshot = await this.env.network.provider.send("evm_snapshot", []); // it is necessary to re-snapshot it
     this.db.deployments = { ...saved.deployments };
   }
 
@@ -1079,7 +1077,7 @@ export class DeploymentsManager {
   }> {
     if (!this.db.accountsLoaded) {
       const chainId = await getChainId(this.env);
-      const accounts = await this.env.ethereum.send("eth_accounts");
+      const accounts = await this.env.network.provider.send("eth_accounts");
       const { namedAccounts, unnamedAccounts } = processNamedAccounts(
         this.env,
         accounts,

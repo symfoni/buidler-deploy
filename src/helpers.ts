@@ -195,7 +195,7 @@ export function addHelpers(
 ): DeploymentsExtension {
   async function init() {
     if (!provider) {
-      provider = new Web3Provider(fixProvider(env.ethereum));
+      provider = new Web3Provider(fixProvider(env.network.provider));
       try {
         const accounts = await provider.send("eth_accounts", []);
         for (const account of accounts) {
