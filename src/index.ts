@@ -1,31 +1,28 @@
+import "./type-extensions";
 import {
-  BuidlerNetworkConfig,
+  HardhatNetworkConfig,
   EthereumProvider,
-  ResolvedBuidlerConfig,
-  BuidlerRuntimeEnvironment,
+  HardhatUserConfig,
+  HardhatRuntimeEnvironment,
   Deployment
-} from "@nomiclabs/buidler/types";
-import { createProvider } from "@nomiclabs/buidler/internal/core/providers/construction";
-import { lazyObject } from "@nomiclabs/buidler/internal/util/lazy";
-import {
-  extendEnvironment,
-  task,
-  internalTask
-} from "@nomiclabs/buidler/config";
-import { BuidlerError } from "@nomiclabs/buidler/internal/core/errors";
+} from "hardhat/types";
+import { createProvider } from "hardhat/internal/core/providers/construction";
+import { lazyObject } from "hardhat/internal/util/lazy";
+import { extendEnvironment, task, internalTask } from "hardhat/config";
+import { HardhatError } from "hardhat/internal/core/errors";
 import {
   JsonRpcServer,
   JsonRpcServerConfig
-} from "@nomiclabs/buidler/internal/buidler-evm/jsonrpc/server";
-import { BUIDLEREVM_NETWORK_NAME } from "@nomiclabs/buidler/internal/constants";
-import * as types from "@nomiclabs/buidler/internal/core/params/argumentTypes";
-import { ERRORS } from "@nomiclabs/buidler/internal/core/errors-list";
+} from "hardhat/internal/hardhat-network/jsonrpc/server";
+import { HARDHAT_NETWORK_NAME } from "hardhat/internal/constants";
+import * as types from "hardhat/internal/core/params/argumentTypes";
+import { ERRORS } from "hardhat/internal/core/errors-list";
 import chalk from "chalk";
 import {
   TASK_NODE,
   TASK_COMPILE_SOLIDITY_GET_COMPILER_INPUT,
   TASK_TEST
-} from "@nomiclabs/buidler/builtin-tasks/task-names";
+} from "hardhat/builtin-tasks/task-names";
 
 import debug from "debug";
 const log = debug("buidler:wighawag:buidler-deploy");
@@ -34,16 +31,16 @@ import { DeploymentsManager } from "./DeploymentsManager";
 import chokidar from "chokidar";
 import { submitSources } from "./etherscan";
 
-function isBuidlerEVM(bre: BuidlerRuntimeEnvironment): boolean {
-  const { network, buidlerArguments, config } = bre;
+function isHardhatEVM(bre: HardhatRuntimeEnvironment): boolean {
+  const { network, hardhatArguments, config } = bre;
   return !(
-    network.name !== BUIDLEREVM_NETWORK_NAME &&
+    network.name !== HARDHAT_NETWORK_NAME &&
     // We normally set the default network as buidlerArguments.network,
     // so this check isn't enough, and we add the next one. This has the
     // effect of `--network <defaultNetwork>` being a false negative, but
     // not a big deal.
-    buidlerArguments.network !== undefined &&
-    buidlerArguments.network !== config.defaultNetwork
+    hardhatArguments.network !== undefined &&
+    hardhatArguments.network !== config.defaultNetwork
   );
 }
 
@@ -328,15 +325,15 @@ export default function() {
     });
 
   function _createBuidlerEVMProvider(
-    config: ResolvedBuidlerConfig
+    config: HardhatUserConfig
   ): EthereumProvider {
     log("Creating BuidlerEVM Provider");
 
-    const networkName = BUIDLEREVM_NETWORK_NAME;
-    const networkConfig = config.networks[networkName] as BuidlerNetworkConfig;
+    const networkName = HARDHAT_NETWORK_NAME;
+    const networkConfig = config.networks[networkName] as HardhatUserConfig;
 
     return lazyObject(() => {
-      log(`Creating buidlerevm provider for JSON-RPC sever`);
+      log(`Creating hardhat evm provider for JSON-RPC sever`);
       return createProvider(
         networkName,
         { loggingEnabled: true, ...networkConfig },
@@ -371,8 +368,8 @@ export default function() {
         return;
       }
 
-      if (!isBuidlerEVM(bre)) {
-        throw new BuidlerError(
+      if (!isHardhatEVM(bre)) {
+        throw new HardhatError(
           ERRORS.BUILTIN_TASKS.JSONRPC_UNSUPPORTED_NETWORK
         );
       }
@@ -445,12 +442,12 @@ export default function() {
 
         let watchRequired;
         try {
-          watchRequired = require("@nomiclabs/buidler/builtin-tasks/utils/watch");
+          watchRequired = require("hardhat/builtin-tasks/utils/watch");
         } catch (e) {}
 
         let reporterRequired;
         try {
-          reporterRequired = require("@nomiclabs/buidler/internal/sentry/reporter");
+          reporterRequired = require("hardhat/internal/sentry/reporter");
         } catch (e) {}
 
         if (watchRequired) {
@@ -480,11 +477,11 @@ export default function() {
         // ] as BuidlerNetworkConfig;
         // logBuidlerEvmAccounts(networkConfig);
       } catch (error) {
-        if (BuidlerError.isBuidlerError(error)) {
+        if (HardhatError.isHardhatError(error)) {
           throw error;
         }
 
-        throw new BuidlerError(
+        throw new HardhatError(
           ERRORS.BUILTIN_TASKS.JSONRPC_SERVER_ERROR,
           {
             error: error.message

@@ -1,13 +1,14 @@
-import "@nomiclabs/buidler/types";
-import { boolean } from "@nomiclabs/buidler/internal/core/params/argumentTypes";
+import "hardhat/types/runtime";
+import "hardhat/types/config";
 import { BigNumber } from "@ethersproject/bignumber";
+import { Artifact, NetworkConfig, EthereumProvider } from "hardhat/types";
 
-declare module "@nomiclabs/buidler/types" {
+declare module "hardhat/types/runtime" {
   // ---------------------------------------------
   // CONFIGURATION EXTENSIONS
   // ---------------------------------------------
 
-  export interface BuidlerConfig {
+  export interface HardhatConfig {
     namedAccounts?: {
       [name: string]:
         | string
@@ -22,7 +23,7 @@ declare module "@nomiclabs/buidler/types" {
     };
   }
 
-  export interface BuidlerNetworkConfig {
+  export interface HardhatNetworkConfig {
     live?: boolean;
     saveDeployments?: boolean;
     tags?: string[];
@@ -34,16 +35,16 @@ declare module "@nomiclabs/buidler/types" {
     tags?: string[];
   }
 
-  export interface ProjectPaths {
+  export interface ProjectPathsConfig {
     deploy?: string;
     deployments?: string;
     imports?: string;
   }
 
   // ---------------------------------------------
-  // BUIDLER RUNTIME EXTENSIONS
+  // HARDHAT RUNTIME EXTENSIONS
   // ---------------------------------------------
-  export interface BuidlerRuntimeEnvironment {
+  export interface HardhatRuntimeEnvironment {
     deployments: DeploymentsExtension;
     getNamedAccounts: () => Promise<{
       [name: string]: Address;
@@ -63,8 +64,8 @@ declare module "@nomiclabs/buidler/types" {
   }
 
   export interface DeployFunction {
-    (env: BuidlerRuntimeEnvironment): Promise<void | boolean>;
-    skip?: (env: BuidlerRuntimeEnvironment) => Promise<boolean>;
+    (env: HardhatRuntimeEnvironment): Promise<void | boolean>;
+    skip?: (env: HardhatRuntimeEnvironment) => Promise<boolean>;
     tags?: string[];
     dependencies?: string[];
     runAtTheEnd?: boolean;
@@ -213,7 +214,7 @@ declare module "@nomiclabs/buidler/types" {
   };
 
   export type FixtureFunc = (
-    env: BuidlerRuntimeEnvironment,
+    env: HardhatRuntimeEnvironment,
     options?: Json
   ) => Promise<any>;
 
