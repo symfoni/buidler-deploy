@@ -100,11 +100,13 @@ task(TASK_COMPILE).setAction(async (args, __, runSuper) => {
 });
 
 module.exports = {
-  solc: {
+  solidity: {
     version: "0.7.1",
-    optimizer: {
-      enabled: true,
-      runs: 2000
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 2000
+      }
     }
   },
   paths: {
