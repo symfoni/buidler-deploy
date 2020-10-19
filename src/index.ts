@@ -307,9 +307,9 @@ export default function() {
       args.log = !args.silent;
       delete args.silent;
       if (args.write === undefined) {
-        args.write = !isBuidlerEVM(bre);
+        args.write = !isHardhatEVM(bre);
       }
-      args.pendingtx = !isBuidlerEVM(bre);
+      args.pendingtx = !isHardhatEVM(bre);
       await bre.run("deploy:run", args);
     });
 
