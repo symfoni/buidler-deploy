@@ -21,7 +21,7 @@ import {
 } from "@ethersproject/transactions";
 
 import debug from "debug";
-const log = debug("hardhat:wighawag:buidler-deploy");
+const log = debug("hardhat:wighawag:harhdat-deploy");
 
 import {
   addDeployments,
@@ -694,9 +694,7 @@ export class DeploymentsManager {
     if (tags !== undefined && typeof tags === "string") {
       tags = [tags];
     }
-    const deployPath =
-      this.env.config.paths.deploy ||
-      path.join(this.env.config.paths.root, "/deploy"); // TODO extendConfig ?
+    const deployPath = this.env.config.paths.deploy;
     let filesStats;
     try {
       filesStats = traverse(deployPath);
@@ -1018,8 +1016,8 @@ export class DeploymentsManager {
 
   private async setup() {
     if (!this.db.deploymentsLoaded) {
-      if (process.env.BUIDLER_DEPLOY_FIXTURE) {
-        if (!process.env.BUIDLER_DEPLOY_NO_COMPILE) {
+      if (process.env.HARDHAT_DEPLOY_FIXTURE) {
+        if (!process.env.HARDHAT_DEPLOY_NO_COMPILE) {
           // console.log("compiling...");
           await this.env.run("compile");
         }
@@ -1027,7 +1025,7 @@ export class DeploymentsManager {
         // console.log("running global fixture....");
         await this.env.deployments.fixture();
       } else {
-        if (process.env.BUIDLER_DEPLOY_COMPILE) {
+        if (process.env.HARDHAT_DEPLOY_COMPILE) {
           // console.log("compiling...");
           await this.env.run("compile");
         }

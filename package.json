@@ -1,8 +1,8 @@
 {
-  "name": "buidler-deploy",
-  "version": "0.7.0-hardhat",
+  "name": "harhdat-deploy",
+  "version": "0.7.0-hardhat.1",
   "description": "Hardhat Plugin For Replicable Deployments And Tests",
-  "repository": "github:wighawag/buidler-deploy",
+  "repository": "github:wighawag/harhdat-deploy",
   "author": "wighawag",
   "license": "MIT",
   "main": "dist/src/index.js",

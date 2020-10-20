@@ -93,7 +93,7 @@ function getLicenseType(license: string): undefined | number {
 }
 
 export async function submitSources(
-  bre: HardhatRuntimeEnvironment,
+  hre: HardhatRuntimeEnvironment,
   solcInputsPath: string,
   config?: {
     etherscanApiKey?: string;
@@ -107,8 +107,8 @@ export async function submitSources(
   const licenseOption = config.license;
   const forceLicense = config.forceLicense;
   const etherscanApiKey = config.etherscanApiKey;
-  const chainId = await bre.getChainId();
-  const all = await bre.deployments.all();
+  const chainId = await hre.getChainId();
+  const all = await hre.deployments.all();
   let host: string;
   switch (chainId) {
     case "1":

@@ -102,7 +102,7 @@ export function loadAllDeployments(
         name = fileName;
       } else {
         throw new Error(
-          `with buidler-deploy >= 0.6 you need to rename network folder without appended chainId
+          `with harhdat-deploy >= 0.6 you need to rename network folder without appended chainId
           You also need to create a '.chainId' file in the folder with the chainId`
         );
       }
@@ -194,7 +194,7 @@ function loadDeployments(
         }
       } else {
         throw new Error(
-          `with buidler-deploy >= 0.6 you are expected to create a '.chainId' file in the deployment folder`
+          `with harhdat-deploy >= 0.6 you are expected to create a '.chainId' file in the deployment folder`
         );
       }
     }

@@ -28,14 +28,14 @@ import {
 } from "hardhat/builtin-tasks/task-names";
 
 import debug from "debug";
-const log = debug("hardhat:wighawag:buidler-deploy");
+const log = debug("hardhat:wighawag:harhdat-deploy");
 
 import { DeploymentsManager } from "./DeploymentsManager";
 import chokidar from "chokidar";
 import { submitSources } from "./etherscan";
 
-function isHardhatEVM(bre: HardhatRuntimeEnvironment): boolean {
-  const { network, hardhatArguments, config } = bre;
+function isHardhatEVM(hre: HardhatRuntimeEnvironment): boolean {
+  const { network, hardhatArguments, config } = hre;
   return !(
     network.name !== HARDHAT_NETWORK_NAME &&
     // We normally set the default network as hardhatArguments.network,
@@ -75,6 +75,12 @@ extendConfig(
       userConfig.paths?.imports,
       "imports"
     );
+
+    config.paths.deploy = normalizePath(
+      config,
+      userConfig.paths?.deploy,
+      "deploy"
+    );
   }
 );
 
@@ -82,7 +88,7 @@ log("start...");
 let deploymentsManager: DeploymentsManager;
 extendEnvironment(env => {
   let live = true;
-  if (env.network.name === "localhost" || env.network.name === "buidlerevm") {
+  if (env.network.name === "localhost" || env.network.name === "harhdat") {
     // the 2 default network are not live network
     live = false;
   }
@@ -204,10 +210,10 @@ internalTask("deploy:run", "deploy ")
     "watchOnly",
     "do not actually deploy, just watch and deploy if changes occurs"
   )
-  .setAction(async (args, bre) => {
+  .setAction(async (args, hre) => {
     async function compileAndDeploy() {
       if (!args.noCompile) {
-        await bre.run("compile");
+        await hre.run("compile");
       }
       return deploymentsManager.runDeploy(args.tags, {
         log: args.log,
@@ -226,10 +232,7 @@ internalTask("deploy:run", "deploy ")
     }> | null = args.watchOnly ? null : compileAndDeploy();
     if (args.watch || args.watchOnly) {
       const watcher = chokidar.watch(
-        [
-          bre.config.paths.sources,
-          bre.config.paths.deploy || bre.config.paths.root + "/deploy"
-        ],
+        [hre.config.paths.sources, hre.config.paths.deploy],
         {
           ignored: /(^|[\/\\])\../, // ignore dotfiles
           persistent: true
@@ -300,12 +303,12 @@ internalTask("deploy:run", "deploy ")
 
 task(TASK_TEST, "Runs mocha tests")
   .addFlag("deployFixture", "run the global fixture before tests")
-  .setAction(async (args, bre, runSuper) => {
-    if (args.deployFixture || process.env.BUIDLER_DEPLOY_FIXTURE) {
-      if (!args.noCompile && !process.env.BUIDLER_DEPLOY_NO_COMPILE) {
-        await bre.run("compile");
+  .setAction(async (args, hre, runSuper) => {
+    if (args.deployFixture || process.env.HARDHAT_DEPLOY_FIXTURE) {
+      if (!args.noCompile && !process.env.HARDHAT_DEPLOY_NO_COMPILE) {
+        await hre.run("compile");
       }
-      await bre.deployments.fixture();
+      await hre.deployments.fixture();
       return runSuper({ ...args, noCompile: true });
     } else {
       return runSuper(args);
@@ -333,14 +336,14 @@ task("deploy", "Deploy contracts")
   .addFlag("reset", "whether to delete deployments files first")
   .addFlag("silent", "whether to remove log")
   .addFlag("watch", "redeploy on every change of contract or deploy script")
-  .setAction(async (args, bre) => {
+  .setAction(async (args, hre) => {
     args.log = !args.silent;
     delete args.silent;
     if (args.write === undefined) {
-      args.write = !isHardhatEVM(bre);
+      args.write = !isHardhatEVM(hre);
     }
-    args.pendingtx = !isHardhatEVM(bre);
-    await bre.run("deploy:run", args);
+    args.pendingtx = !isHardhatEVM(hre);
+    await hre.run("deploy:run", args);
   });
 
 task(
@@ -349,12 +352,12 @@ task(
 )
   .addOptionalParam("export", "export current network deployments")
   .addOptionalParam("exportAll", "export all deployments into one file")
-  .setAction(async (args, bre) => {
+  .setAction(async (args, hre) => {
     await deploymentsManager.loadDeployments(false);
     await deploymentsManager.export(args);
   });
 
-task(TASK_NODE, "Starts a JSON-RPC server on top of Buidler EVM")
+task(TASK_NODE, "Starts a JSON-RPC server on top of Harhdat EVM")
   .addOptionalParam("export", "export current network deployments")
   .addOptionalParam("exportAll", "export all deployments into one file")
   .addOptionalParam("tags", "dependencies to run")
@@ -374,30 +377,30 @@ task(TASK_NODE, "Starts a JSON-RPC server on top of Buidler EVM")
   .addFlag("silent", "whether to renove log")
   .addFlag("noDeploy", "do not deploy")
   .addFlag("watch", "redeploy on every change of contract or deploy script")
-  .setAction(async (args, bre, runSuper) => {
+  .setAction(async (args, hre, runSuper) => {
     if (args.noDeploy) {
       await runSuper(args);
       return;
     }
 
-    if (!isHardhatEVM(bre)) {
+    if (!isHardhatEVM(hre)) {
       throw new HardhatError(ERRORS.BUILTIN_TASKS.JSONRPC_UNSUPPORTED_NETWORK);
     }
 
-    const { config } = bre;
+    const { config } = hre;
 
-    bre.network.name = "localhost"; // Ensure deployments can be fetched with console
-    // TODO use localhost config ? // Or post an issue on buidler
+    hre.network.name = "localhost"; // Ensure deployments can be fetched with console
+    // TODO use localhost config ? // Or post an issue on harhdat
     const watch = args.watch;
     args.watch = false;
     args.log = !args.silent;
     delete args.silent;
     args.pendingtx = false;
-    await bre.run("deploy:run", args);
+    await hre.run("deploy:run", args);
 
     // enable logging
     // TODO fix this when there's a proper mechanism for doing this
-    let provider = bre.network.provider as any;
+    let provider = hre.network.provider as any;
     let i = 0;
     while (provider._loggingEnabled === undefined) {
       if (provider._provider !== undefined) {
@@ -408,7 +411,7 @@ task(TASK_NODE, "Starts a JSON-RPC server on top of Buidler EVM")
         throw new Error("should not happen");
       }
 
-      // a BuidlerEVMProvider should eventually be found, but
+      // a HarhdatEVMProvider should eventually be found, but
       // just in case we add a max number of iterations here
       // to avoid and endless loop
       i++;
@@ -425,7 +428,7 @@ task(TASK_NODE, "Starts a JSON-RPC server on top of Buidler EVM")
       const serverConfig: JsonRpcServerConfig = {
         hostname,
         port,
-        provider: bre.network.provider
+        provider: hre.network.provider
       };
 
       server = new JsonRpcServer(serverConfig);
@@ -457,12 +460,12 @@ task(TASK_NODE, "Starts a JSON-RPC server on top of Buidler EVM")
         } catch (error) {
           console.warn(
             chalk.yellow(
-              "There was a problem watching the compiler output, changes in the contracts won't be reflected in the Buidler EVM. Run Buidler with --verbose to learn more."
+              "There was a problem watching the compiler output, changes in the contracts won't be reflected in the Harhdat EVM. Run Harhdat with --verbose to learn more."
             )
           );
 
           log(
-            "Compilation output can't be watched. Please report this to help us improve Buidler.\n",
+            "Compilation output can't be watched. Please report this to help us improve Harhdat.\n",
             error
           );
           if (reporterRequired) {
@@ -473,9 +476,9 @@ task(TASK_NODE, "Starts a JSON-RPC server on top of Buidler EVM")
       }
 
       // const networkConfig = config.networks[
-      //   BUIDLEREVM_NETWORK_NAME
-      // ] as BuidlerNetworkConfig;
-      // logBuidlerEvmAccounts(networkConfig);
+      //   HARDHAT_NETWORK_NAME
+      // ] as HarhdatNetworkConfig;
+      // logHarhdatEvmAccounts(networkConfig);
     } catch (error) {
       if (HardhatError.isHardhatError(error)) {
         throw error;
@@ -490,7 +493,7 @@ task(TASK_NODE, "Starts a JSON-RPC server on top of Buidler EVM")
       );
     }
     if (watch) {
-      await bre.run("deploy:run", { ...args, watchOnly: true });
+      await hre.run("deploy:run", { ...args, watchOnly: true });
     }
     await server.waitUntilClosed();
   });
@@ -511,7 +514,7 @@ task("etherscan-verify", "submit contract source code to etherscan")
     "solcInput",
     "fallback on solc-input (useful when etherscan fails on the minimum sources)"
   )
-  .setAction(async (args, bre, runSuper) => {
+  .setAction(async (args, hre, runSuper) => {
     const etherscanApiKey = args.apiKey || process.env.ETHERSCAN_API_KEY;
     if (!etherscanApiKey) {
       throw new Error(
@@ -519,7 +522,7 @@ task("etherscan-verify", "submit contract source code to etherscan")
       );
     }
     const solcInputsPath = await deploymentsManager.getSolcInputPath();
-    await submitSources(bre, solcInputsPath, {
+    await submitSources(hre, solcInputsPath, {
       etherscanApiKey,
       license: args.license,
       fallbackOnSolcInput: args.solcInput,
