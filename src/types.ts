@@ -2,9 +2,12 @@ import {
   Deployment,
   FixtureFunc,
   DeploymentSubmission,
-  Artifact,
-  ABI
-} from "@nomiclabs/buidler/types";
+  Artifact
+} from "hardhat/types";
+
+export type ExtendedArtifact = Artifact & {
+  metadata?: string;
+};
 
 export interface PartialExtension {
   save(name: string, deployment: DeploymentSubmission): Promise<void>;
@@ -12,7 +15,7 @@ export interface PartialExtension {
   getOrNull(name: string): Promise<Deployment | null>;
   getDeploymentsFromAddress(address: string): Promise<Deployment[]>;
   all(): Promise<{ [name: string]: Deployment }>;
-  getArtifact(name: string): Promise<Artifact>;
+  getArtifact(name: string): Promise<ExtendedArtifact>;
   run(
     tags?: string | string[],
     options?: {

@@ -1,6 +1,5 @@
-import { Artifacts } from "@nomiclabs/buidler/plugins";
 import {
-  BuidlerRuntimeEnvironment,
+  HardhatRuntimeEnvironment,
   DeployFunction,
   Deployment,
   DeploymentsExtension,
@@ -8,8 +7,9 @@ import {
   DeploymentSubmission,
   Export,
   MultiExport
-} from "@nomiclabs/buidler/types";
-import { PartialExtension } from "./types";
+} from "hardhat/types";
+import { Artifacts } from "hardhat/internal/artifacts";
+import { ExtendedArtifact, PartialExtension } from "./types";
 
 import fs from "fs-extra";
 import path from "path";
@@ -21,7 +21,7 @@ import {
 } from "@ethersproject/transactions";
 
 import debug from "debug";
-const log = debug("buidler:wighawag:buidler-deploy");
+const log = debug("hardhat:wighawag:buidler-deploy");
 
 import {
   addDeployments,
@@ -29,7 +29,8 @@ import {
   getChainId,
   loadAllDeployments,
   traverse,
-  deleteDeployments
+  deleteDeployments,
+  getArtifactFromFolder
 } from "./utils";
 import { addHelpers, waitForTx } from "./helpers";
 import {
@@ -64,10 +65,10 @@ export class DeploymentsManager {
     migrations: { [id: string]: number };
   };
 
-  private env: BuidlerRuntimeEnvironment;
+  private env: HardhatRuntimeEnvironment;
   private deploymentsPath: string;
 
-  constructor(env: BuidlerRuntimeEnvironment) {
+  constructor(env: HardhatRuntimeEnvironment) {
     log("constructing DeploymentsManager");
     this.db = {
       accountsLoaded: false,
@@ -124,59 +125,23 @@ export class DeploymentsManager {
         await this.setup();
         return this.db.deployments; // TODO copy
       },
-      getArtifact: async (contractName: string): Promise<any> => {
-        const artifacts = new Artifacts(this.env.config.paths.artifacts);
-        let artifact;
-        let lastError: any;
-        try {
-          artifact = await artifacts.readArtifact(contractName);
-        } catch (e) {
-          lastError = e;
-          const importPaths = this.getImportPaths();
-          for (const importPath of importPaths) {
-            const importsArtifacts = new Artifacts(importPath);
-            try {
-              artifact = await importsArtifacts.readArtifact(contractName);
-              if (artifact) {
-                return artifact;
-              }
-            } catch (ee) {
-              lastError = new Error(
-                `cannot get artifact ${contractName} at ${importPath}`
-              );
-            }
+      getArtifact: async (contractName: string): Promise<ExtendedArtifact> => {
+        let artifact:
+          | ExtendedArtifact
+          | undefined = await this.env.artifacts.readArtifact(contractName);
+        if (artifact) {
+          return artifact;
+        }
+        const importPaths = this.getImportPaths();
+        for (const importPath of importPaths) {
+          artifact = await getArtifactFromFolder(contractName, importPath);
+          if (artifact) {
+            return artifact;
           }
         }
+
         if (!artifact) {
-          throw lastError;
-        }
-        return artifact;
-      },
-      getArtifactSync: (contractName: string): any => {
-        const artifacts = new Artifacts(this.env.config.paths.artifacts);
-        let artifact;
-        let lastError: any;
-        try {
-          artifact = artifacts.readArtifactSync(contractName);
-        } catch (e) {
-          lastError = e;
-          const importPaths = this.getImportPaths();
-          for (const importPath of importPaths) {
-            const importsArtifacts = new Artifacts(importPath);
-            try {
-              artifact = importsArtifacts.readArtifactSync(contractName);
-              if (artifact) {
-                return artifact;
-              }
-            } catch (ee) {
-              lastError = new Error(
-                `cannot get artifact ${contractName} at ${importPath}`
-              );
-            }
-          }
-        }
-        if (!artifact) {
-          throw lastError;
+          throw new Error(`cannot find artifact "${contractName}"`);
         }
         return artifact;
       },

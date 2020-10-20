@@ -15,7 +15,7 @@ import {
 import { zeroPad, hexlify } from "@ethersproject/bytes";
 import { Interface, FunctionFragment } from "@ethersproject/abi";
 import {
-  BuidlerRuntimeEnvironment,
+  HardhatRuntimeEnvironment,
   Deployment,
   DeployResult,
   DeploymentsExtension,
@@ -26,24 +26,34 @@ import {
   CallOptions,
   SimpleTx,
   Receipt,
-  Execute,
   Address,
   DiamondOptions,
   LinkReferences,
   Create2DeployOptions,
   FacetCut
-} from "@nomiclabs/buidler/types";
-import { PartialExtension } from "./types";
+} from "hardhat/types";
+import { ExtendedArtifact, PartialExtension } from "./types";
 import { UnknownSignerError } from "./errors";
-import { mergeABIs } from "./utils";
-import eip173Proxy from "../artifacts/EIP173Proxy.json";
-import diamondBase from "../artifacts/Diamond.json";
-import diamondCutFacet from "../artifacts/DiamondCutFacet.json";
-import diamondLoupeFacet from "../artifacts/DiamondLoupeFacet.json";
-import ownershipFacet from "../artifacts/OwnershipFacet.json";
-import diamantaire from "../artifacts/Diamantaire.json";
+import { mergeABIs, getArtifactFromFolderSync } from "./utils";
 import fs from "fs";
 import path from "path";
+
+const artifactsFolder = path.join(__dirname, "../artifacts");
+const eip173Proxy = getArtifactFromFolderSync("EIP173", artifactsFolder);
+const diamondBase = getArtifactFromFolderSync("Diamond", artifactsFolder);
+const diamondCutFacet = getArtifactFromFolderSync(
+  "DiamondCutFacet",
+  artifactsFolder
+);
+const diamondLoupeFacet = getArtifactFromFolderSync(
+  "DiamondLoupeFacet",
+  artifactsFolder
+);
+const ownershipFacet = getArtifactFromFolderSync(
+  "OwnershipFacet",
+  artifactsFolder
+);
+const diamantaire = getArtifactFromFolderSync("Diamantaire", artifactsFolder);
 
 diamondBase.abi = mergeABIs(
   false,
@@ -182,7 +192,7 @@ let solcOutput: {
 let provider: Web3Provider;
 const availableAccounts: { [name: string]: boolean } = {};
 export function addHelpers(
-  env: BuidlerRuntimeEnvironment,
+  env: HardhatRuntimeEnvironment,
   partialExtension: PartialExtension, // TODO
   getArtifact: (name: string) => Promise<Artifact>,
   onPendingTx: (

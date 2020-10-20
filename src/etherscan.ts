@@ -3,7 +3,7 @@ import axios from "axios";
 import qs from "qs";
 import path from "path";
 import { defaultAbiCoder, ParamType } from "@ethersproject/abi";
-import { BuidlerRuntimeEnvironment } from "@nomiclabs/buidler/types";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 import chalk from "chalk";
 import matchAll from "match-all";
 
@@ -93,7 +93,7 @@ function getLicenseType(license: string): undefined | number {
 }
 
 export async function submitSources(
-  bre: BuidlerRuntimeEnvironment,
+  bre: HardhatRuntimeEnvironment,
   solcInputsPath: string,
   config?: {
     etherscanApiKey?: string;

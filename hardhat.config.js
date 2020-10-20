@@ -1,10 +1,10 @@
 const fs = require("fs");
 const path = require("path");
-const { internalTask, task } = require("@nomiclabs/buidler/config");
+const { internalTask, task } = require("hardhat/config");
 const {
-  TASK_COMPILE_GET_COMPILER_INPUT,
+  TASK_COMPILE_SOLIDITY_GET_COMPILER_INPUT,
   TASK_COMPILE
-} = require("@nomiclabs/buidler/builtin-tasks/task-names");
+} = require("hardhat/builtin-tasks/task-names");
 
 function addIfNotPresent(array, value) {
   if (array.indexOf(value) === -1) {
@@ -51,7 +51,7 @@ function setupExtraSolcSettings(settings) {
   // addIfNotPresent(settings.outputSelection["*"][""], "ast");
 }
 
-internalTask(TASK_COMPILE_GET_COMPILER_INPUT).setAction(
+internalTask(TASK_COMPILE_SOLIDITY_GET_COMPILER_INPUT).setAction(
   async (_, __, runSuper) => {
     const input = await runSuper();
     setupExtraSolcSettings(input.settings);
@@ -59,45 +59,6 @@ internalTask(TASK_COMPILE_GET_COMPILER_INPUT).setAction(
     return input;
   }
 );
-
-task(TASK_COMPILE).setAction(async (args, __, runSuper) => {
-  await runSuper(args);
-  const solcOutputString = fs.readFileSync("./cache/solc-output.json");
-  const solcOutput = JSON.parse(solcOutputString);
-
-  const artifactFolderpath = "./artifacts";
-  const files = fs.readdirSync(artifactFolderpath);
-  for (const file of files) {
-    const artifactFilepath = path.join(artifactFolderpath, file);
-    const artifactString = fs.readFileSync(artifactFilepath);
-    const artifact = JSON.parse(artifactString);
-    let contractFilepath;
-    let contractSolcOutput;
-    for (const fileEntry of Object.entries(solcOutput.contracts)) {
-      for (const contractEntry of Object.entries(fileEntry[1])) {
-        if (contractEntry[0] === artifact.contractName) {
-          if (
-            artifact.bytecode ===
-            "0x" + contractEntry[1].evm.bytecode.object
-          ) {
-            contractSolcOutput = contractEntry[1];
-            contractFilepath = fileEntry[0];
-          }
-        }
-      }
-    }
-    if (contractSolcOutput) {
-      artifact.metadata = contractSolcOutput.metadata;
-      artifact.contractFilepath = contractFilepath;
-      artifact.methodIdentifiers = contractSolcOutput.evm.methodIdentifiers;
-      artifact.gasEstimates = contractSolcOutput.evm.gasEstimates;
-      artifact.storageLayout = contractSolcOutput.storageLayout;
-      artifact.userdoc = contractSolcOutput.userdoc;
-      artifact.devdoc = contractSolcOutput.devdoc;
-    }
-    fs.writeFileSync(artifactFilepath, JSON.stringify(artifact, null, "  "));
-  }
-});
 
 module.exports = {
   solidity: {

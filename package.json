@@ -1,7 +1,7 @@
 {
   "name": "buidler-deploy",
-  "version": "0.7.0-buidler2.1",
-  "description": "Buidler Plugin For Replicable Deployments And Tests",
+  "version": "0.7.0-hardhat",
+  "description": "Hardhat Plugin For Replicable Deployments And Tests",
   "repository": "github:wighawag/buidler-deploy",
   "author": "wighawag",
   "license": "MIT",
@@ -14,8 +14,8 @@
     "test",
     "testing",
     "tool",
-    "buidler",
-    "buidler-plugin"
+    "hardhat",
+    "hardhat-plugin"
   ],
   "files": [
     "dist/src/",
@@ -47,7 +47,7 @@
     "typescript": "^3.4.5"
   },
   "peerDependencies": {
-    "@nomiclabs/buidler": "^1.99.0"
+    "hardhat": "^2.0.0-rc.0"
   },
   "dependencies": {
     "@ethersproject/abi": "^5.0.2",
@@ -70,14 +70,14 @@
     "qs": "^6.9.4"
   },
   "scripts": {
-    "compile": "buidler compile",
+    "compile": "hardhat compile",
     "lint:fix": "prettier --write src/**/*.{js,ts} test/**/*.{js,ts} && tslint --fix --config tslint.json --project tsconfig.json",
     "lint": "tslint --config tslint.json --project tsconfig.json",
     "test": "mocha --timeout 20000 --exit",
     "build": "tsc",
     "watch": "tsc -w",
-    "next": "npm publish --tag next",
-    "buidler2": "npm publish --tag buidler2",
+    "publish:next": "npm publish --tag next",
+    "publish:hardhat": "npm publish --tag hardhat",
     "prepublishOnly": "npm run build"
   }
 }
