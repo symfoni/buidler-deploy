@@ -87,9 +87,7 @@ export class DeploymentsManager {
       gasPrice: undefined
     };
     this.env = env;
-    this.deploymentsPath =
-      env.config.paths.deployments ||
-      path.join(env.config.paths.root, "/deployments");
+    this.deploymentsPath = env.config.paths.deployments;
 
     this.env.getChainId = () => {
       return getChainId(this.env);
@@ -1001,10 +999,7 @@ export class DeploymentsManager {
   }
 
   private getImportPaths() {
-    let importPaths: string[] = ["imports"];
-    if (this.env.config.paths.imports) {
-      importPaths = [this.env.config.paths.imports];
-    }
+    let importPaths = [this.env.config.paths.imports];
     const externalImports =
       this.env.config.external && this.env.config.external.artifacts;
     if (externalImports) {

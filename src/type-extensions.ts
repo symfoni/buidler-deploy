@@ -88,7 +88,7 @@ declare module "hardhat/types/runtime" {
 
   export interface Network {
     live: boolean;
-    saveDeployments?: boolean;
+    saveDeployments: boolean;
     tags: Record<string, boolean>;
   }
 

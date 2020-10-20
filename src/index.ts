@@ -1,6 +1,17 @@
 import "./type-extensions";
-import { HardhatRuntimeEnvironment, Deployment } from "hardhat/types";
-import { extendEnvironment, task, internalTask } from "hardhat/config";
+import path from "path";
+import {
+  HardhatRuntimeEnvironment,
+  Deployment,
+  HardhatConfig,
+  HardhatUserConfig
+} from "hardhat/types";
+import {
+  extendEnvironment,
+  task,
+  internalTask,
+  extendConfig
+} from "hardhat/config";
 import { HardhatError } from "hardhat/internal/core/errors";
 import {
   JsonRpcServer,
@@ -35,6 +46,37 @@ function isHardhatEVM(bre: HardhatRuntimeEnvironment): boolean {
     hardhatArguments.network !== config.defaultNetwork
   );
 }
+
+function normalizePath(
+  config: HardhatConfig,
+  userPath: string | undefined,
+  defaultPath: string
+): string {
+  if (userPath === undefined) {
+    userPath = path.join(config.paths.root, defaultPath);
+  } else {
+    if (!path.isAbsolute(userPath)) {
+      userPath = path.normalize(path.join(config.paths.root, userPath));
+    }
+  }
+  return userPath;
+}
+
+extendConfig(
+  (config: HardhatConfig, userConfig: Readonly<HardhatUserConfig>) => {
+    config.paths.deployments = normalizePath(
+      config,
+      userConfig.paths?.deployments,
+      "deployments"
+    );
+
+    config.paths.imports = normalizePath(
+      config,
+      userConfig.paths?.imports,
+      "imports"
+    );
+  }
+);
 
 log("start...");
 let deploymentsManager: DeploymentsManager;
