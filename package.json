@@ -1,8 +1,8 @@
 {
-  "name": "harhdat-deploy",
-  "version": "0.7.0-hardhat.1",
+  "name": "hardhat-deploy",
+  "version": "0.7.0-beta.0",
   "description": "Hardhat Plugin For Replicable Deployments And Tests",
-  "repository": "github:wighawag/harhdat-deploy",
+  "repository": "github:wighawag/hardhat-deploy",
   "author": "wighawag",
   "license": "MIT",
   "main": "dist/src/index.js",
@@ -77,7 +77,6 @@
     "build": "tsc",
     "watch": "tsc -w",
     "publish:next": "npm publish --tag next",
-    "publish:hardhat": "npm publish --tag hardhat",
     "prepublishOnly": "npm run build"
   }
 }

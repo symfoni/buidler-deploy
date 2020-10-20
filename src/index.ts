@@ -28,7 +28,7 @@ import {
 } from "hardhat/builtin-tasks/task-names";
 
 import debug from "debug";
-const log = debug("hardhat:wighawag:harhdat-deploy");
+const log = debug("hardhat:wighawag:hardhat-deploy");
 
 import { DeploymentsManager } from "./DeploymentsManager";
 import chokidar from "chokidar";
@@ -88,7 +88,7 @@ log("start...");
 let deploymentsManager: DeploymentsManager;
 extendEnvironment(env => {
   let live = true;
-  if (env.network.name === "localhost" || env.network.name === "harhdat") {
+  if (env.network.name === "localhost" || env.network.name === "hardhat") {
     // the 2 default network are not live network
     live = false;
   }
@@ -357,7 +357,7 @@ task(
     await deploymentsManager.export(args);
   });
 
-task(TASK_NODE, "Starts a JSON-RPC server on top of Harhdat EVM")
+task(TASK_NODE, "Starts a JSON-RPC server on top of Hardhat EVM")
   .addOptionalParam("export", "export current network deployments")
   .addOptionalParam("exportAll", "export all deployments into one file")
   .addOptionalParam("tags", "dependencies to run")
@@ -390,7 +390,7 @@ task(TASK_NODE, "Starts a JSON-RPC server on top of Harhdat EVM")
     const { config } = hre;
 
     hre.network.name = "localhost"; // Ensure deployments can be fetched with console
-    // TODO use localhost config ? // Or post an issue on harhdat
+    // TODO use localhost config ? // Or post an issue on hardhat
     const watch = args.watch;
     args.watch = false;
     args.log = !args.silent;
@@ -411,7 +411,7 @@ task(TASK_NODE, "Starts a JSON-RPC server on top of Harhdat EVM")
         throw new Error("should not happen");
       }
 
-      // a HarhdatEVMProvider should eventually be found, but
+      // a HardhatEVMProvider should eventually be found, but
       // just in case we add a max number of iterations here
       // to avoid and endless loop
       i++;
@@ -460,12 +460,12 @@ task(TASK_NODE, "Starts a JSON-RPC server on top of Harhdat EVM")
         } catch (error) {
           console.warn(
             chalk.yellow(
-              "There was a problem watching the compiler output, changes in the contracts won't be reflected in the Harhdat EVM. Run Harhdat with --verbose to learn more."
+              "There was a problem watching the compiler output, changes in the contracts won't be reflected in the Hardhat EVM. Run Hardhat with --verbose to learn more."
             )
           );
 
           log(
-            "Compilation output can't be watched. Please report this to help us improve Harhdat.\n",
+            "Compilation output can't be watched. Please report this to help us improve Hardhat.\n",
             error
           );
           if (reporterRequired) {
@@ -477,8 +477,8 @@ task(TASK_NODE, "Starts a JSON-RPC server on top of Harhdat EVM")
 
       // const networkConfig = config.networks[
       //   HARDHAT_NETWORK_NAME
-      // ] as HarhdatNetworkConfig;
-      // logHarhdatEvmAccounts(networkConfig);
+      // ] as HardhatNetworkConfig;
+      // logHardhatEvmAccounts(networkConfig);
     } catch (error) {
       if (HardhatError.isHardhatError(error)) {
         throw error;

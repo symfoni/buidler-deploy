@@ -213,7 +213,7 @@ export function addHelpers(
           availableAccounts[account.toLowerCase()] = true;
         }
       } catch (e) {}
-      // TODO wait for harhdat to have the info in artifact
+      // TODO wait for hardhat to have the info in artifact
       try {
         solcOutput = JSON.parse(
           fs
@@ -398,7 +398,7 @@ export function addHelpers(
         );
       }
     } else {
-      // TODO wait for harhdat v2 // then we can hard fails on missing metadata
+      // TODO wait for hardhat v2 // then we can hard fails on missing metadata
       // if (artifact.metadata) {
       //   contractSolcOutput = {
       //     metadata: artifact.metadata,
@@ -510,7 +510,7 @@ export function addHelpers(
       } catch (e) {}
     }
 
-    // const extendedAtifact = artifact as any; // TODO future version of harhdat will hopefully have that info
+    // const extendedAtifact = artifact as any; // TODO future version of hardhat will hopefully have that info
     const preDeployment = {
       abi,
       args,

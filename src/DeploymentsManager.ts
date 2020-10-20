@@ -21,7 +21,7 @@ import {
 } from "@ethersproject/transactions";
 
 import debug from "debug";
-const log = debug("hardhat:wighawag:harhdat-deploy");
+const log = debug("hardhat:wighawag:hardhat-deploy");
 
 import {
   addDeployments,

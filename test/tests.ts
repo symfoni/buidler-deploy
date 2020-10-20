@@ -1,18 +1,18 @@
 // tslint:disable-next-line no-implicit-dependencies
 import { assert } from "chai";
 
-// import { ExampleHarhdatRuntimeEnvironmentField } from "../src/ExampleHarhdatRuntimeEnvironmentField";
+// import { ExampleHardhatRuntimeEnvironmentField } from "../src/ExampleHardhatRuntimeEnvironmentField";
 
 import { useEnvironment } from "./helpers";
 
 describe("Integration tests examples", function() {
-  describe("Harhdat Runtime Environment extension", function() {
-    useEnvironment(__dirname + "/harhdat-project");
+  describe("Hardhat Runtime Environment extension", function() {
+    useEnvironment(__dirname + "/hardhat-project");
 
     // it("It should add the example field", function() {
     //   assert.instanceOf(
     //     this.env.example,
-    //     ExampleHarhdatRuntimeEnvironmentField
+    //     ExampleHardhatRuntimeEnvironmentField
     //   );
     // });
 
@@ -23,10 +23,10 @@ describe("Integration tests examples", function() {
 });
 
 describe("Unit tests examples", function() {
-  describe("ExampleHarhdatRuntimeEnvironmentField", function() {
+  describe("ExampleHardhatRuntimeEnvironmentField", function() {
     describe("sayHello", function() {
       // it("Should say hello", function() {
-      //   const field = new ExampleHarhdatRuntimeEnvironmentField();
+      //   const field = new ExampleHardhatRuntimeEnvironmentField();
       //   assert.equal(field.sayHello(), "hello");
       // });
     });

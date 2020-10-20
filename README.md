@@ -1,28 +1,28 @@
-[![harhdat](https://harhdat.org/harhdat-plugin-badge.svg?1)](https://harhdat.org)
+[![hardhat](https://hardhat.org/hardhat-plugin-badge.svg?1)](https://hardhat.org)
 
-<h1> harhdat-deploy</h1>
+<h1> hardhat-deploy</h1>
 
-_A Harhdat Plugin For Replicable Deployments And Tests_
+_A Hardhat Plugin For Replicable Deployments And Tests_
 
-[Harhdat](https://harhdat.org) Deployment And Test Plugin.
+[Hardhat](https://hardhat.org) Deployment And Test Plugin.
 
 - [What is it for ?](#what-is-it-for-)
 - [Installation](#installation)
-  - [npm install harhdat-deploy](#npm-install-harhdat-deploy)
+  - [npm install hardhat-deploy](#npm-install-hardhat-deploy)
   - [TypeScript support](#typescript-support)
-  - [Migrating existing deployment to harhdat-deploy](#migrating-existing-deployment-to-harhdat-deploy)
-- [Harhdat Tasks Availabled/Updated](#harhdat-tasks-availabledupdated)
-  - [harhdat deploy](#harhdat-deploy)
+  - [Migrating existing deployment to hardhat-deploy](#migrating-existing-deployment-to-hardhat-deploy)
+- [Hardhat Tasks Availabled/Updated](#hardhat-tasks-availabledupdated)
+  - [hardhat deploy](#hardhat-deploy)
     - [Options](#options)
     - [Flags](#flags)
-  - [harhdat node](#harhdat-node)
-  - [harhdat test](#harhdat-test)
-  - [harhdat etherscan-verify](#harhdat-etherscan-verify)
+  - [hardhat node](#hardhat-node)
+  - [hardhat test](#hardhat-test)
+  - [hardhat etherscan-verify](#hardhat-etherscan-verify)
     - [Options](#options-1)
     - [Flags](#flags-1)
-  - [harhdat export](#harhdat-export)
+  - [hardhat export](#hardhat-export)
     - [Options](#options-2)
-- [Harhdat Environment Extensions](#harhdat-environment-extensions)
+- [Hardhat Environment Extensions](#hardhat-environment-extensions)
 - [Configuration](#configuration)
   - [namedAccounts (ability to name addresses)](#namedaccounts-ability-to-name-addresses)
   - [extra network's config](#extra-networks-config)
@@ -39,7 +39,7 @@ _A Harhdat Plugin For Replicable Deployments And Tests_
 - [Deploying and Upgrading Proxies](#deploying-and-upgrading-proxies)
 - [Builtin-In Support For Diamonds (EIP2535)](#builtin-in-support-for-diamonds-eip2535)
 - [Testing Deployed Contracts](#testing-deployed-contracts)
-- [More Information On Harhdat Tasks](#more-information-on-harhdat-tasks)
+- [More Information On Hardhat Tasks](#more-information-on-hardhat-tasks)
   - [node task](#node-task)
   - [test task](#test-task)
   - [run task](#run-task)
@@ -48,7 +48,7 @@ _A Harhdat Plugin For Replicable Deployments And Tests_
 
 ## What is it for ?
 
-This [harhdat](https://harhdat.dev) plugin adds a mechanism to deploy contracts to any network, keeping track of them and replicating the same environment for testing.
+This [hardhat](https://hardhat.dev) plugin adds a mechanism to deploy contracts to any network, keeping track of them and replicating the same environment for testing.
 
 It also adds a mechanism to associate names to addresses so test and deployment scripts can be reconfigured by simply changing the address a name points to, allowing different configurations per network. This also results in much clearer tests and deployment scripts (no more `accounts[2]` in your code).
 
@@ -57,7 +57,7 @@ This plugin contains a lot more features too, all geared toward a better develop
 - chain configuration export, listing deployed contract, their abi and address, usefull for webapps.
 - library linking at time of deployment
 - deterministic deployment across networks
-- ability to submit contract source to etherscan for verification. Because harhdat-deploy will save all necessary info, it can be executed at any time.
+- ability to submit contract source to etherscan for verification. Because hardhat-deploy will save all necessary info, it can be executed at any time.
 - deployment dependency system (allowing you to only deploy what is needed).
 - deployment as migration so once a deployment is done, it can be set to never be executed again.
 - deployment retrying (by saving pending tx): so you can feel confident when making a deployment that you can always recover.
@@ -73,21 +73,21 @@ This plugin contains a lot more features too, all geared toward a better develop
 - save metadata of deployed contract so they can always be fully verified, via [sourcify](https://github.com/ethereum/sourcify) or [etherscan](https://etherscan.io).
 - proxy deployment with ability to upgrade them transparently, only if code changes.
 - diamond deployment with facets, allowing you to focus on what the new version will be. It will generate the diamondCut necessary to reach the new state.
-- watch and deploy: harhdat-deploy can watch both your deploy script and contract code and redeploy on changes.
+- watch and deploy: hardhat-deploy can watch both your deploy script and contract code and redeploy on changes.
 - HCR (Hot Contract Replacement): the watch feature combined with proxy or diamond, gives you an experience akin to frontend Hot Module Replacement: Once your contract change, the deployment is executed and your contract retain the same address and same state.
 
 ## Installation
 
-### npm install harhdat-deploy
+### npm install hardhat-deploy
 
 ```bash
-npm install -D harhdat-deploy
+npm install -D hardhat-deploy
 ```
 
-And add the following statement to your `harhdat.config.js`:
+And add the following statement to your `hardhat.config.js`:
 
 ```js
-import "harhdat-deploy";
+import "hardhat-deploy";
 ```
 
 ### TypeScript support
@@ -102,25 +102,25 @@ for deploy script (see below) you can write them this way to benefit from typing
 
 ```
 import {
-  HarhdatRuntimeEnvironment,
+  HardhatRuntimeEnvironment,
   DeployFunction,
-} from "harhdat/types";
+} from "hardhat/types";
 
-const func: DeployFunction = async function (hre: HarhdatRuntimeEnvironment) {
+const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // code here
 };
 export default func;
 ```
 
-TODO update: See a full example of typescript usage here : https://github.com/wighawag/harhdat-deploy-ts-test
+TODO update: See a full example of typescript usage here : https://github.com/wighawag/hardhat-deploy-ts-test
 
-### Migrating existing deployment to harhdat-deploy
+### Migrating existing deployment to hardhat-deploy
 
-You might want to switch your current deployment process to use harhdat-deploy. In that case you probably have some deployments saved elsewhere.
+You might want to switch your current deployment process to use hardhat-deploy. In that case you probably have some deployments saved elsewhere.
 
-In order to port them to harhdat-deploy, you'll need to create one `.json` file per contract in the `deployments/<network>` folder (configurable via [paths config](#extra-paths-config)).
+In order to port them to hardhat-deploy, you'll need to create one `.json` file per contract in the `deployments/<network>` folder (configurable via [paths config](#extra-paths-config)).
 
-The network folder is simply the harhdat network name (as configured in harhdat.config.js) (accessible at runtime via `hre.network.name`).
+The network folder is simply the hardhat network name (as configured in hardhat.config.js) (accessible at runtime via `hre.network.name`).
 Such folder need to have a file named `.chainId` containing the chainId as decimal.
 
 For example for network named "rinkeby" (for the corresponding network) the file `deployments/rinkeby/.chainId` would be
@@ -129,7 +129,7 @@ For example for network named "rinkeby" (for the corresponding network) the file
 4
 ```
 
-Note, prior to harhdat 0.6 the chainId was appended to the folder name (expect for some known network name). This has changed and upgrading to 0.6 will require you to change the folder name and add the '.chainId' file.
+Note, prior to hardhat 0.6 the chainId was appended to the folder name (expect for some known network name). This has changed and upgrading to 0.6 will require you to change the folder name and add the '.chainId' file.
 
 Each contract file must follow this type (as defined in [src/type-extensions.d.ts](src/type-extensions.d.ts)) :
 
@@ -205,16 +205,16 @@ deployments/
     Registry.json
 ```
 
-The reason why harhdat-deploy save chainId in the `.chainId` file is both for
+The reason why hardhat-deploy save chainId in the `.chainId` file is both for
 
 - safety: so that if you were to change the network to point to a different chain, it would not attempt to read the wrong folder and assume that a contract has been deployed while it has not.
-- ability to know the chainId without requring to be connected to a node (and so not dependent on harhdat.config.js settings). Useful for `export` task.
+- ability to know the chainId without requring to be connected to a node (and so not dependent on hardhat.config.js settings). Useful for `export` task.
 
-## Harhdat Tasks Availabled/Updated
+## Hardhat Tasks Availabled/Updated
 
-### harhdat deploy
+### hardhat deploy
 
-This plugin adds the _deploy_ task to Harhdat.
+This plugin adds the _deploy_ task to Hardhat.
 
 This task will execute the scripts in the `deploy` folder and save the contract deployments to disk. These deployments are supposed to be saved for example in a git repository. This way they can be accessed later.
 
@@ -232,7 +232,7 @@ For further details on how to use it and write deploy script, see [section](#dep
 
 `--tags <tags>`: only excute deploy scripts with the given tags and their dependencies (see more info [here](#deploy-scripts-tags-and-dependencies) about tags and dependencies)
 
-`--gasprice <gasprice>`: specify the gasprice to use by default for transactions executed via harhdat-deploy helpers in deploy scripts
+`--gasprice <gasprice>`: specify the gasprice to use by default for transactions executed via hardhat-deploy helpers in deploy scripts
 
 `--write <boolean>`: default to true (except for hardhat network). If true, write deployments to disk (in deployments path, see [path config](#extra-paths-config)).
 
@@ -240,39 +240,39 @@ For further details on how to use it and write deploy script, see [section](#dep
 
 `--reset`: This flag reset the deployments from scratch. Previously deployed contract are not considered and deleted from disk.
 
-`--silent`: This flag remove harhdat-deploy log output (see log function and log options for [`hre.deployments`](#the-deployments-field))
+`--silent`: This flag remove hardhat-deploy log output (see log function and log options for [`hre.deployments`](#the-deployments-field))
 
 `--watch`: This flag make the task never ending, watching for file changes in the deploy scripts folder and the contract source folder. If any changes happen the contracts are recompiled and the deploy script are re-run. Combined with a proxy deployment ([Proxies](#deploying-and-upgrading-proxies) or [Diamond](#builtin-in-support-for-diamonds-eip2535)) this allow to have HCR (Hot Contract Replacement).
 
-### harhdat node
+### hardhat node
 
 This plugin modify the _node_ task so that it also execute the deployment script before exposing the server http RPC interface
 
 It also add the same options as the _deploy_ task with the same functionality. It adds an extra flag:
 
-`--no-deploy` that discard all other options to revert to normal `harhdat node` behavior without any deployment being performed.
+`--no-deploy` that discard all other options to revert to normal `hardhat node` behavior without any deployment being performed.
 
-Note that the deployments are saved as if the network name is `localhost`. This is because `harhdat node` is expected to be used as localhost: You can for example execute `harhdat --network localhost console` after `node` is running. Doing `builder --network hardhat console` would indeed not do anythong useful. It still take the configuration from `hardhat` in the harhdat.config.js file though.
+Note that the deployments are saved as if the network name is `localhost`. This is because `hardhat node` is expected to be used as localhost: You can for example execute `hardhat --network localhost console` after `node` is running. Doing `builder --network hardhat console` would indeed not do anythong useful. It still take the configuration from `hardhat` in the hardhat.config.js file though.
 
-### harhdat test
+### hardhat test
 
 This plugin add to the _test_ task a flag argument `--deploy-fixture` that run the global deployments fixture before the tests and snapshot it.
 
-### harhdat etherscan-verify
+### hardhat etherscan-verify
 
-This plugin adds the _etherscan-verify_ task to Harhdat.
+This plugin adds the _etherscan-verify_ task to Hardhat.
 
 This task will submit the contract source and other info of all deployed contracts to allow etherscan to verify and record the sources.
 
 Instead of using the full solc input, this task will first attempt to send the minimal sources from the metadata.
-But Etherscan sometime fails due to a bug in solidity compiler (https://github.com/ethereum/solidity/issues/9573). As such this task can fallback on full solc input (see option --solc-input). Note that if your contract was deployed with a previous version of harhdat-deploy, it might not contains the full information.
+But Etherscan sometime fails due to a bug in solidity compiler (https://github.com/ethereum/solidity/issues/9573). As such this task can fallback on full solc input (see option --solc-input). Note that if your contract was deployed with a previous version of hardhat-deploy, it might not contains the full information.
 
 This task will also attempt to automatically find the SPDX license in the source.
 
 To execute that task, you need to specifiy the network to run against :
 
 ```
-harhdat --network mainnet etherscan-verify --api-key <apikey>
+hardhat --network mainnet etherscan-verify --api-key <apikey>
 ```
 
 #### Options
@@ -287,9 +287,9 @@ harhdat --network mainnet etherscan-verify --api-key <apikey>
 
 `--force-license`: This flag force the use of the license specified by --license (useful if your inline SPDX are not compatible with etherscan list)
 
-### harhdat export
+### hardhat export
 
-This plugin adds the _export_ task to Harhdat.
+This plugin adds the _export_ task to Hardhat.
 
 This task will export the contract deployed (saved in `deployments` folder) to a simple format containing only contract addresses and abi, useful for web apps.
 
@@ -300,11 +300,11 @@ One of the following options need to be set for this task to have any effects :
 `--export <filepath>`: export one file that contains all contracts (address, abi + extra data) for the network being invoked. The file contains the minimal information so to not bloat your frontend.
 
 `--export-all <filepath>`: export one file that contains all contracts across all saved deployment, regardless of the network being invoked.
-This last option has some limitations, when combined with the use of external deployments (see [Configuration](#configuration)). If such external deployments were using older version of harhdat-deploy or truffle, the chainId might be missing. In order for these to be exported, the harhdat network config need to explicity state the chainId in the `networks` config of `harhdat.config.js`.
+This last option has some limitations, when combined with the use of external deployments (see [Configuration](#configuration)). If such external deployments were using older version of hardhat-deploy or truffle, the chainId might be missing. In order for these to be exported, the hardhat network config need to explicity state the chainId in the `networks` config of `hardhat.config.js`.
 
-## Harhdat Environment Extensions
+## Hardhat Environment Extensions
 
-This plugin extends the Harhdat Runtime Environment by adding 4 fields:
+This plugin extends the Hardhat Runtime Environment by adding 4 fields:
 
 - `getNamedAccounts: () => Promise<{ [name: string]: string }>`: a function returning an object whose keys are names and values are addresses. It is parsed from the `namedAccounts` configuration (see [Configuration](#configuration)).
 
@@ -318,7 +318,7 @@ This plugin extends the Harhdat Runtime Environment by adding 4 fields:
 
 ### namedAccounts (ability to name addresses)
 
-This plugin extends the `HarhdatConfig`'s object with an optional `namedAccounts` field.
+This plugin extends the `HardhatConfig`'s object with an optional `namedAccounts` field.
 
 `namedAccounts` allows you to associate names to addresses and have them configured per chain.
 This allows you to have meaningful names in your tests while the addresses match to multi sig in real network for example.
@@ -328,9 +328,9 @@ This allows you to have meaningful names in your tests while the addresses match
     namedAccounts: {
         deployer: {
             default: 0, // here this will by default take the first account as deployer
-            1: 0, // similarly on mainnet it will take the first account as deployer. Note though that depending on how harhdat network are configured, the account 0 on one network can be different than on another
+            1: 0, // similarly on mainnet it will take the first account as deployer. Note though that depending on how hardhat network are configured, the account 0 on one network can be different than on another
             4: '0xA296a3d5F026953e17F472B497eC29a5631FB51B', // but for rinkeby it will be a specific address
-            "goerli": '0x84b9514E013710b9dD0811c9Fe46b837a4A0d8E0', //it can also specify a specific netwotk name (specified in harhdat.config.js)
+            "goerli": '0x84b9514E013710b9dD0811c9Fe46b837a4A0d8E0', //it can also specify a specific netwotk name (specified in hardhat.config.js)
         },
         feeCollector:{
             default: 1, // here this will by default take the second account as feeCollector (so in the test this will be a different account than the deployer)
@@ -343,11 +343,11 @@ This allows you to have meaningful names in your tests while the addresses match
 
 ### extra network's config
 
-harhdat-deploy add 2 new fields to `networks` configuration
+hardhat-deploy add 2 new fields to `networks` configuration
 
 `live` : this is not used internally but is useful to perform action on a network whether it is a live network (rinkeby, mainnet, etc) or a temporary one (localhost, hardhat). The default is true (except for localhost and hardhat where the default is false).
 
-`saveDeployments`: this tell whether harhdat-deploy should save the deployments to disk or not. Default to true.
+`saveDeployments`: this tell whether hardhat-deploy should save the deployments to disk or not. Default to true.
 
 `tags`: network can have tags to represent them. The config is an array and at runtime the hre.network.tags is an object whose fields (the tags) are set to true.
 
@@ -379,7 +379,7 @@ Example:
 
 ### extra paths config
 
-It also adds fields to `HarhdatConfig`'s `ProjectPaths` object.
+It also adds fields to `HardhatConfig`'s `ProjectPaths` object.
 
 Here is an example showing the default values :
 
@@ -393,17 +393,17 @@ Here is an example showing the default values :
 }
 ```
 
-The deploy folder is expected to contains the deploy script that are executed upon invocation of `harhdat deploy` or `harhdat node`
+The deploy folder is expected to contains the deploy script that are executed upon invocation of `hardhat deploy` or `hardhat node`
 
 The deployment folder will contains the resulting deployments (contract addresses along their abi, bytecode, metadata...). One folder per network and one file per contract.
 
-The imports folder is expected to contains artifacts that were pre-compiled. Useful if you want to upgrade to a new solidity version but want to keep using previously compiled contracts. The artifact is the same format as normal harhdat artifact, so you can easily copy them over, before switching to a new compiler version.
+The imports folder is expected to contains artifacts that were pre-compiled. Useful if you want to upgrade to a new solidity version but want to keep using previously compiled contracts. The artifact is the same format as normal hardhat artifact, so you can easily copy them over, before switching to a new compiler version.
 
 ### Importing deployment from other projects (truffle support too)
 
-It also add the `external` field to `HarhdatConfig`
+It also add the `external` field to `HardhatConfig`
 
-Such fiels allows to specify paths for external artifacts or deployments. The use of the `paths` field is not possible because harhdat expects all paths field to be string. It does not accept arrays or objects, see https://github.com/nomiclabs/harhdat/issues/776.
+Such fiels allows to specify paths for external artifacts or deployments. The use of the `paths` field is not possible because hardhat expects all paths field to be string. It does not accept arrays or objects, see https://github.com/nomiclabs/hardhat/issues/776.
 
 The external object has 2 fields:
 
@@ -418,33 +418,33 @@ The external object has 2 fields:
 }
 ```
 
-The artifacts fields specify an array of path to look for artifact. it support both harhdat and truffle artifacts.
+The artifacts fields specify an array of path to look for artifact. it support both hardhat and truffle artifacts.
 
-The deployments fields specify an object whose field name are the harhdat network and the value is an array of path to look for deployments. It supports both harhdat-deploy and truffle formats.
+The deployments fields specify an object whose field name are the hardhat network and the value is an array of path to look for deployments. It supports both hardhat-deploy and truffle formats.
 
 ### Access to Artifacts (non-deployed contract code and abi)
 
 you can access contract artifact via `getArtifact` function :
 
 ```js
-const { deployments } = require("harhdat");
+const { deployments } = require("hardhat");
 const artifact = await deployments.getArtifact(artifactName);
 ```
 
 With the `buidler-ethers-v5` plugin you can get your ethers contract via :
 
 ```js
-const { deployments, ethers } = require("harhdat");
+const { deployments, ethers } = require("hardhat");
 const factory = await ethers.getContractFactory(artifactName);
 ```
 
-Note that the artifact file need to be either in `artifacts` folder that harhdat generate on compilation or in the `imports` folder where you can store contracts compiled elsewhere. They can also be present in the folder specified in `external.artifacts` see [Importing deployment from other projects](#importing-deployment-from-other-projects-truffle-support-too)
+Note that the artifact file need to be either in `artifacts` folder that hardhat generate on compilation or in the `imports` folder where you can store contracts compiled elsewhere. They can also be present in the folder specified in `external.artifacts` see [Importing deployment from other projects](#importing-deployment-from-other-projects-truffle-support-too)
 
 ## How to Deploy Contracts
 
 ### The `deploy` Task
 
-`harhdat --network <networkName> deploy [options and flags]`
+`hardhat --network <networkName> deploy [options and flags]`
 
 This is a new task that the plugin adds. As the name suggests it deploys contracts.
 To be exact it will look for files in the folder `deploy` or whatever was configured in `paths.deploy`, see [paths config](#extra-paths-config)
@@ -453,9 +453,9 @@ It will scan for files in alphabetical order and execute them in turn.
 
 - it will `require` each of these files and execute the exported function with the HRE as argument
 
-Note that running `harhdat deploy` without specifying a network will use the default network. If the default network is an internal ganache or hardhat then nothing will happen as a result but this can be used to ensure the deployment is without issues.
+Note that running `hardhat deploy` without specifying a network will use the default network. If the default network is an internal ganache or hardhat then nothing will happen as a result but this can be used to ensure the deployment is without issues.
 
-To specified the network, you can use the builtin harhdat argument `--network <network name>` or set the env variable `HARDHAT_NETWORK`
+To specified the network, you can use the builtin hardhat argument `--network <network name>` or set the env variable `HARDHAT_NETWORK`
 
 ### Deploy Scripts
 
@@ -463,8 +463,8 @@ The deploy scripts need to be of the following type :
 
 ```js
 export interface DeployFunction {
-  (env: HarhdatRuntimeEnvironment): Promise<void | boolean>;
-  skip?: (env: HarhdatRuntimeEnvironment) => Promise<boolean>;
+  (env: HardhatRuntimeEnvironment): Promise<void | boolean>;
+  skip?: (env: HardhatRuntimeEnvironment) => Promise<boolean>;
   tags?: string[];
   dependencies?: string[];
   runAtTheEnd?: boolean;
@@ -542,7 +542,7 @@ save(name: string, deployment: DeploymentSubmission): Promise<void>; // low leve
 get(name: string): Promise<Deployment>; // fetch a deployment by name, throw if not existing
 getOrNull(name: string): Promise<Deployment | null>; // fetch deployment by name, return null if not existing
 all(): Promise<{ [name: string]: Deployment }>; // return all deployments
-getArtifact(name: string): Promise<Artifact>; // return a harhdat artifact (compiled contract without deployment)
+getArtifact(name: string): Promise<Artifact>; // return a hardhat artifact (compiled contract without deployment)
 run( // execute deployment scripts
   tags?: string | string[],
   options?: {
@@ -643,7 +643,7 @@ This `libraries` object takes the name of the library, and its deployed address 
 
 ## Exporting Deployments
 
-Apart from deployments saved in the `deployments` folder which contains all information available about the contract (compile time data + deployment data), `harhdat-deploy` allows you to export lightweight file.
+Apart from deployments saved in the `deployments` folder which contains all information available about the contract (compile time data + deployment data), `hardhat-deploy` allows you to export lightweight file.
 
 These can be used for example to power your frontend with contract's address and abi.
 
@@ -659,7 +659,7 @@ export interface Export {
 }
 ```
 
-where name is the name of the network configuration chosen (see harhdat option `--network`)
+where name is the name of the network configuration chosen (see hardhat option `--network`)
 
 The second one is exported via the `--export-all <file>` option and follow the following format :
 
@@ -671,7 +671,7 @@ export type MultiExport = {
 
 As you see the second format include the previous. While in most case you'll need the single export where your application will support only one network, there are case where your app would want to support multiple network at nonce. This second format allow for that.
 
-Furthermore as harhdat support multiple network configuration for the same network (rinkeby, mainnet...), the export-all format will contains each of them grouped by their chainId.
+Furthermore as hardhat support multiple network configuration for the same network (rinkeby, mainnet...), the export-all format will contains each of them grouped by their chainId.
 
 ## Deploying and Upgrading Proxies
 
@@ -734,7 +734,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
 
 Note that for the second invokation, this deployment will fails to upgrade the proxy as the `from` which is `deployer` is not the same as the proxy's owner : `greeterOwner`
 
-To make it work, you have to create a new script that have for `from` field: `greeterOwner`. If such value is a a multi sig or an address not registered as part of harhdat signers, the tx will not be executed but instead an error will be throw, mentionning the tx data necessary to perform the upgrade.
+To make it work, you have to create a new script that have for `from` field: `greeterOwner`. If such value is a a multi sig or an address not registered as part of hardhat signers, the tx will not be executed but instead an error will be throw, mentionning the tx data necessary to perform the upgrade.
 
 ## Builtin-In Support For Diamonds (EIP2535)
 
@@ -776,7 +776,7 @@ Then the NewFacet will be deployed automatically if needed and then the diamondC
 
 Note that if the code for Facet2 and Facet3 changes, they will also be redeployed automatically and the diamondCuts will replace the existing facets with these new ones.
 
-Note that The Diamond contract's code is part of harhdat-deploy and contains 3 built-in facet that can be removed manually if desired.
+Note that The Diamond contract's code is part of hardhat-deploy and contains 3 built-in facet that can be removed manually if desired.
 These facets are used for ownership, diamondCut and diamond loupe.
 
 The implementation is the [reference implementation by Nick Mudge](https://github.com/mudgen/Diamond)
@@ -797,7 +797,7 @@ diamond.deploy("ADiamondContract", {
 });
 ```
 
-Since the diamond standard has no builtin mechanism to make the deployment of Diamond with function execution, the Diamond when deployed is actually deployed through a special contract, the `Diamantaire` (see code [here](solc_0.7/diamond/Diamantaire.sol)) that act as factory to build Diamond. It uses deterministic deployment for that so, it is transparently managed by harhdat-deploy.
+Since the diamond standard has no builtin mechanism to make the deployment of Diamond with function execution, the Diamond when deployed is actually deployed through a special contract, the `Diamantaire` (see code [here](solc_0.7/diamond/Diamantaire.sol)) that act as factory to build Diamond. It uses deterministic deployment for that so, it is transparently managed by hardhat-deploy.
 
 The Diamantaire also support the deterministic deployment of Diamond.
 An extra field can be passed to the Diamond deployment options : `deterministicSalt`. It has to be a non-zero 32bytes string (in hex format).
@@ -807,14 +807,14 @@ Note that if you want to deploy 2 diamonds with same owner, you'll need 2 differ
 
 You can continue using the usual test task :
 
-`harhdat test`
+`hardhat test`
 
 Tests can then use the `hre.deployments.fixture` function to run the deployment for the test and snapshot it so that tests don't need to perform all the deployments transaction every time, they simply reuse the snapshot for every test (this leverages `evm_snapshot` and `evm_revert` provided by both `hardhat` and `ganache`). You can for example set them in a `beaforeEach`.
 
 Here is an example of a test :
 
 ```js
-const { deployments } = require("harhdat");
+const { deployments } = require("hardhat");
 
 describe("Token", () => {
   beforeEach(async () => {
@@ -834,7 +834,7 @@ If the deployment scripts are complex, the first test could take while (as the f
 Tests can also leverage named accounts for clearer test. Combined with `buidler-ethers-v5` plugin, you can write succint test :
 
 ```js
-const { ethers, getNamedAccounts } = require("harhdat");
+const { ethers, getNamedAccounts } = require("hardhat");
 
 describe("Token", () => {
   beforeEach(async () => {
@@ -875,20 +875,20 @@ describe("Token", () => {
 
 While this example is trivial, some fixture can requires several transaction and the ability to snapshot them automatically speed up the tests greatly.
 
-## More Information On Harhdat Tasks
+## More Information On Hardhat Tasks
 
 ### node task
 
 as mentioned above, the node task is slighly modified and augmented with various flag and options
 
-`harhdat node`
+`hardhat node`
 
 In particulat It adds an argument `--export` that allows you to specify a destination file where the info about the contracts deployed is written.
 Your webapp can then access all contracts information.
 
 ### test task
 
-`harhdat test`
+`hardhat test`
 
 the test task is augmented with one flag argument `--deploy-fixture` that allow to run all deployments in a fixture snapshot before executing the tests. This can speed up tests that use specific tags as the global fixture take precedence (unless specified).
 
@@ -900,16 +900,16 @@ If a test need the deployments to only include the specific deployment specified
 deployments.fixture("<specific tag>", { fallbackToGlobal: false });
 ```
 
-Due to how snapshot/revert works in harhdat, this means that these test will not be able to benefit from the global fixture snapshot and will have to deploy their contract as part of the fixture call. This is automatix but means that these tests will run slower.
+Due to how snapshot/revert works in hardhat, this means that these test will not be able to benefit from the global fixture snapshot and will have to deploy their contract as part of the fixture call. This is automatix but means that these tests will run slower.
 
 ### run task
 
-`harhdat --network <networkName> run <script>`
+`hardhat --network <networkName> run <script>`
 
 The run task act as before but thanks to the `hre.deployments` field it can access deployed contract :
 
 ```js
-const hre = require("harhdat");
+const hre = require("hardhat");
 const { deployments, getNamedAccounts } = hre;
 
 (async () => {
@@ -920,17 +920,17 @@ const { deployments, getNamedAccounts } = hre;
 
 You can also run it directly from the command line as usual.
 
-`HARDHAT_NETWORK=rinkeby node <script>` is the equivalent except it does not load the harhdat environment twice (which the run task does)
+`HARDHAT_NETWORK=rinkeby node <script>` is the equivalent except it does not load the hardhat environment twice (which the run task does)
 
 ### console task
 
-`harhdat console`
+`hardhat console`
 
 The same applies to the `console` task.
 
 ## Deploy Scripts: Tags And Dependencies
 
-It is possible to execute only specific part of the deployments with `harhdat deploy --tags <tags>`
+It is possible to execute only specific part of the deployments with `hardhat deploy --tags <tags>`
 
 Tags represent what the deploy script acts on. In general it will be a single string value, the name of the contract it deploys or modifies.
 
@@ -979,7 +979,7 @@ module.exports.dependencies = ["Token"]; // this ensure the TOken script above i
 
 As you can see the second one depends on the first. This is because the second script depends on a tag that the first script registers as using.
 
-With that when `harhdat deploy --tags Sale` is executed
+With that when `hardhat deploy --tags Sale` is executed
 
 then both scripts will be run, ensuring Sale is ready.
 
